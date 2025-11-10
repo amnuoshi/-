@@ -1,52 +1,635 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
+    <title>404 错误 - 页面未找到</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #fafafa;
+            overflow: hidden;
+        }
 
-<meta charset="utf-8">
+        .error-container {
+            width: 100%;
+            padding: 20px;
+        }
 
-<title>耄皇妙妙网</title>
+        h1 {
+            font-size: 20vw;
+            margin: 0;
+            line-height: 1;
+            color: #333;
+        }
 
-<link rel="icon" href="http://img1.ali213.net/glpic/2024/07/28/20240728104246778.png" type="image/png">
+        .message-cn {
+            font-size: 3vw;
+            margin: 20px 0 10px;
+        }
 
-<style>
-.mighty-text {
+        .message-en {
+            font-size: 2vw;
+            margin: 0;
+            color: #666;
+        }
 
-    font-family: "SimHei", "Microsoft YaHei", Impact, sans-serif;
-    font-size: 36px;
-    font-weight: 900;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    letter-spacing: 2px;
-    color: #d4af37;
-}
+        .enter-link {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #333;
+            text-decoration: underline;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out;
+            cursor: pointer;
+            background: rgba(255,255,255,0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
 
-</style>
+            .enter-link.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
 
+            .enter-link.hideout {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        /* 新内容的样式 */
+        .new-content {
+            width: 100%;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: #000;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+            .new-content h2 {
+                font-size: 2.5rem;
+                margin: 20px 0;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+
+        .category-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .category-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: left;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .resource-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+        }
+
+            .resource-link:hover {
+                transform: translateY(-5px);
+                background: rgba(255,255,255,0.25);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            }
+
+        .resource-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.2);
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        .loading-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .resource-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .resource-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .back-button {
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            background: white;
+            color: #1a2a6c;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-weight: bold;
+        }
+
+            .back-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .links-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .new-content h2 {
+                font-size: 1.8rem;
+            }
+
+            .category-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<header style = "background-color:#f1f1f1;text-align:center;padding:40px;">
+    <div class="error-container">
+        <h1>404</h1>
+        <div class="message-cn">抱歉，您所请求的页面不存在</div>
+        <div class="message-en">Sorry, the page you requested does not exist.</div>
+    </div>
 
-<p class="mighty-text">既见耄皇，为何不拜</p>
+    <!-- 新内容区域 -->
+    <div class="new-content" id="newContent">
+        <h2>资源库</h2>
 
-<img src='https://imgs.qiubiaoqing.com/qiubiaoqing/user_pre_up_imgs/6830779443b1278N.jpg' alt="耄耋猫" width="150px" height="150px">
+        <!-- 人工智能 -->
+        <div class="category-container">
+            <div class="category-title">🤖 人工智能</div>
+            <div class="links-grid" id="ai-links">
+                <a href="https://chat.openai.com" target="_blank" class="resource-link" data-domain="openai.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">ChatGPT</div>
+                    <div class="resource-desc">OpenAI旗下的全能型AI助手</div>
+                </a>
+                <a href="https://gemini.google.com" target="_blank" class="resource-link" data-domain="gemini.google.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Gemini</div>
+                    <div class="resource-desc">Google旗下的对话式AI助手</div>
+                </a>
+                <a href="https://chat.deepseek.com" target="_blank" class="resource-link" data-domain="deepseek.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">DeepSeek</div>
+                    <div class="resource-desc">深度求索旗下的逻辑面AI助手</div>
+                </a>
+                <a href="https://www.doubao.com" target="_blank" class="resource-link" data-domain="doubao.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">豆包</div>
+                    <div class="resource-desc">字节跳动旗下的玩具区AI助手</div>
+                </a>
+            </div>
+        </div>
 
-</header>
+        <!-- 代码编程 -->
+        <div class="category-container">
+            <div class="category-title">💻 代码编程</div>
+            <div class="links-grid" id="dev-links">
+                <a href="https://github.com" target="_blank" class="resource-link" data-domain="github.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">GitHub</div>
+                    <div class="resource-desc">代码托管和协作平台</div>
+                </a>
+                <a href="https://stackoverflow.com" target="_blank" class="resource-link" data-domain="stackoverflow.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Stack Overflow</div>
+                    <div class="resource-desc">程序员问答社区</div>
+                </a>
+                <a href="https://code.visualstudio.com" target="_blank" class="resource-link" data-domain="code.visualstudio.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Visual Studio Code</div>
+                    <div class="resource-desc">轻量级代码编辑器</div>
+                </a>
+                <a href="https://visualstudio.microsoft.com" target="_blank" class="resource-link" data-domain="visualstudio.microsoft.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Visual Studio 20xx</div>
+                    <div class="resource-desc">重量级代码编辑器</div>
+                </a>
+            </div>
+        </div>
 
-<div style = "max-width:700px;margin:30px auto;padding:15px;line-height:1.7;">
+        <!-- 软件工具 -->
+        <div class="category-container">
+            <div class="category-title">🛠️ 软件工具</div>
+            <div class="links-grid" id="tool-links">
+                <a href="https://lmstudio.ai" target="_blank" class="resource-link" data-domain="lmstudio.ai">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">LM Studio</div>
+                    <div class="resource-desc">本地运行开源大模型的软件</div>
+                </a>
+                <a href="https://www.tbtool.cn" target="_blank" class="resource-link" data-domain="https://www.tbtool.cn/resource/icon.ico">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">图吧工具箱</div>
+                    <div class="resource-desc">DIY爱好者的必备工具合集</div>
+                </a>
+                <a href="https://www.internetdownloadmanager.com" target="_blank" class="resource-link" data-domain="internetdownloadmanager.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Internet Download Manager</div>
+                    <div class="resource-desc">Internet下载管理器</div>
+                </a>
+                <a href="https://potplayer.tv" target="_blank" class="resource-link" data-domain="potplayer.tv">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Potplayer</div>
+                    <div class="resource-desc">功能齐全的视频播放器</div>
+                </a>
+                <a href="https://www.rarlab.com/download.htm" target="_blank" class="resource-link" data-domain="rarlab.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">WinRAR</div>
+                    <div class="resource-desc">电脑端的解压缩软件</div>
+                </a>
+                <a href="https://www.zdevs.ru/en/za/apk.html" target="_blank" class="resource-link" data-domain="https://www.zdevs.ru/img/icon_za.png">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">ZArchiver</div>
+                    <div class="resource-desc">移动端的解压缩软件</div>
+                </a>
+                <a href="https://mtool.app" target="_blank" class="resource-link" data-domain="mtool.app">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">MTool</div>
+                    <div class="resource-desc">主要支持翻译RPG Macker等游戏引擎</div>
+                </a>
+                <a href="https://www.renpythief.com" target="_blank" class="resource-link" data-domain="https://www.renpythief.com/pic/logo.ico">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">RenpyThief</div>
+                    <div class="resource-desc">主要支持翻译Unity等游戏引擎</div>
+                </a>
+            </div>
+        </div>
 
-<p>妙妙视频网址：<a href="https://www.bilibili.com/video/BV1GJ411x7h7?vd_source=127ce74dffc6ce6c5e1a2c4da26ad091">噔噔噔~</a></p>
+        <!-- 游戏开发 -->
+        <div class="category-container">
+            <div class="category-title">🎮 游戏开发</div>
+            <div class="links-grid" id="game-links">
+                <a href="https://godotengine.org" target="_blank" class="resource-link" data-domain="godotengine.org">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Godot Engine</div>
+                    <div class="resource-desc">免费开源的游戏引擎</div>
+                </a>
+                <a href="https://www.piskelapp.com" target="_blank" class="resource-link" data-domain="piskelapp.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Piskel</div>
+                    <div class="resource-desc">免费的动画精灵和像素在线编辑器</div>
+                </a>
+            </div>
+        </div>
 
-</div>
+        <!-- 虚拟专网 -->
+        <div class="category-container">
+            <div class="category-title">🌐 虚拟专网</div>
+            <div class="links-grid" id="vpn-links">
+                <a href="https://m.bj1ch.com" target="_blank" class="resource-link" data-domain="m.bj1ch.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Whale</div>
+                    <div class="resource-desc">白鲸加速器</div>
+                </a>
+                <a href="https://www.muguacloud.icu/auth/register" target="_blank" class="resource-link" data-domain="muguacloud.icu">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">MuguaCloud</div>
+                    <div class="resource-desc">木瓜云加速器</div>
+                </a>
+                <a href="https://ikuuu.one/auth/register?code=jgAg" target="_blank" class="resource-link" data-domain="ikuuu.de">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">iKuuu</div>
+                    <div class="resource-desc">爱坤加速器</div>
+                </a>
+                <a href="https://web.vtpro.xyz" target="_blank" class="resource-link" data-domain="web.vtpro.xyz">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">ViewTurbo</div>
+                    <div class="resource-desc">来自新加坡的加速器</div>
+                </a>
+            </div>
+        </div>
 
-<div style = "background-color:#f1f1f1;text-align:center;padding:40px;">
+        <!-- 色情黄区 -->
+        <div class="category-container">
+            <div class="category-title">🔞 色情黄区</div>
+            <div class="links-grid" id="sex-links">
+                <a href="https://theporndude.com/zh" target="_blank" class="resource-link" data-domain="theporndude.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Porn Dude</div>
+                    <div class="resource-desc">最全的色情资源网站一号</div>
+                </a>
+                <a href="https://qingse.one" target="_blank" class="resource-link" data-domain="qingse.one">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Qing Se</div>
+                    <div class="resource-desc">最全的色情资源网站二号</div>
+                </a>
+                <a href="https://pornhub.com" target="_blank" class="resource-link" data-domain="pornhub.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Pornhub</div>
+                    <div class="resource-desc">P站三次元版</div>
+                </a>
+                <a href="https://www.pixiv.net/?lang=zh" target="_blank" class="resource-link" data-domain="pixiv.net">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Pixiv</div>
+                    <div class="resource-desc">P站二次元版</div>
+                </a>
+                <a href="https://jable.tv" target="_blank" class="resource-link" data-domain="jable.tv">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Jable</div>
+                    <div class="resource-desc">AV番号站</div>
+                </a>
+                <a href="https://x12q0gwdtfyq6.com:58010" target="_blank" class="resource-link" data-domain="x12q0gwdtfyq6.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">BY</div>
+                    <div class="resource-desc">中文黄网</div>
+                </a>
+                <a href="https://asmr-200.com/works" target="_blank" class="resource-link" data-domain="asmr-200.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">ASMR Online</div>
+                    <div class="resource-desc">ASMR一号</div>
+                </a>
+                <a href="https://www.jasmr.net" target="_blank" class="resource-link" data-domain="jasmr.net">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">JASMR</div>
+                    <div class="resource-desc">ASMR二号</div>
+                </a>
+                <a href="https://www.asmr.pw/asmr" target="_blank" class="resource-link" data-domain="asmr.pw">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">基佬中心</div>
+                    <div class="resource-desc">ASMR三号</div>
+                </a>
+                <a href="https://www.dzmm.ai" target="_blank" class="resource-link" data-domain="dzmm.ai">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">DZMM</div>
+                    <div class="resource-desc">色系AI</div>
+                </a>
+                <a href="https://hanime1.me" target="_blank" class="resource-link" data-domain="hanime1.me">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">Hanime1</div>
+                    <div class="resource-desc">里番、黄漫网</div>
+                </a>
+                <a href="https://mingqiceping.com" target="_blank" class="resource-link" data-domain="mingqiceping.com">
+                    <div class="loading-icon"></div>
+                    <div class="resource-name">FJB</div>
+                    <div class="resource-desc">飞机杯测评网</div>
+                </a>
+            </div>
+        </div>
 
-<p>哈基米</p>
 
-</div>
+
+
+    </div>
+
+    <a href="javascript:void(0)" class="enter-link" id="enterLink">进入隐藏空间</a>
+
+    <script>
+        const delayShowMs = 3000;   // 等待 3 秒后出现
+        const hideAfterMs  = 1500;  // 出现后 1.5 秒后隐藏
+
+        const linkEl = document.getElementById('enterLink');
+        const errorContainer = document.querySelector('.error-container');
+        const newContent = document.getElementById('newContent');
+
+        // 隐藏链接的显示/隐藏逻辑
+        setTimeout(() => {
+        linkEl.classList.add('visible');
+        setTimeout(() => {
+        linkEl.classList.add('hideout');
+        linkEl.style.pointerEvents = 'none';
+        }, hideAfterMs);
+        }, delayShowMs);
+
+        // 点击隐藏链接的事件
+        linkEl.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // 添加淡出效果
+        errorContainer.style.transition = 'opacity 0.8s ease';
+        errorContainer.style.opacity = '0';
+
+        // 等待淡出动画完成后显示新内容
+        setTimeout(() => {
+        // 隐藏404内容
+        errorContainer.style.display = 'none';
+
+        // 显示新内容
+        newContent.style.display = 'flex';
+
+        // 添加淡入效果
+        setTimeout(() => {
+        newContent.style.opacity = '1';
+        // 加载网站图标
+        loadAllFavicons();
+        }, 50);
+        }, 800);
+        });
+
+        // 重置页面的函数（从新内容返回404页面）
+        function resetPage() {
+        // 淡出新内容
+        newContent.style.opacity = '0';
+
+        setTimeout(() => {
+        // 隐藏新内容
+        newContent.style.display = 'none';
+
+        // 显示404内容
+        errorContainer.style.display = 'block';
+
+        // 淡入404内容
+        setTimeout(() => {
+        errorContainer.style.opacity = '1';
+        }, 50);
+        }, 800);
+        }
+
+        // 初始化样式
+        newContent.style.opacity = '0';
+        newContent.style.transition = 'opacity 0.8s ease';
+
+        // 加载网站图标的函数
+        function loadAllFavicons() {
+        const resourceLinks = document.querySelectorAll('.resource-link');
+
+        resourceLinks.forEach(link => {
+        const domain = link.getAttribute('data-domain');
+        if (domain) {
+        loadFavicon(link, domain);
+        }
+        });
+        }
+
+        function loadFavicon(linkElement, domain) {
+        // 使用多个图标源，增加成功率
+        let iconSources = [];
+        if (domain === 'm.bj1ch.com') {
+        iconSources = [
+        `https://m.bj1ch.com/favicon.ico`,  // 白鲸加速器专用优先图标
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+        `https://${domain}/favicon.ico`
+        ];
+        }
+        else if (domain === 'jable.tv') {
+        iconSources = [
+        `https://assets-cdn.jable.tv/assets/icon/favicon.png`,  // Jable专用优先图标
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+        `https://${domain}/favicon.ico`
+        ];
+        }
+        else if (domain === 'x12q0gwdtfyq6.com') {
+        iconSources = [
+        `https://files.shenqizhilv.com:36666/img/favicon_all.ico`,  // BY专用优先图标
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+        `https://${domain}/favicon.ico`
+        ];
+        }
+        else if (domain === 'jasmr.net') {
+        iconSources = [
+        `https://www.jasmr.net/files/icons/jasmr_120.webp`,  // JASMR专用优先图标
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+        `https://${domain}/favicon.ico`
+        ];
+        }
+        else {
+        iconSources = [
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+        `https://${domain}/favicon.ico`
+        ];
+        }
+
+        const loadingIcon = linkElement.querySelector('.loading-icon');
+        if (!loadingIcon) return;
+
+        // 创建图片元素来测试图标是否可用
+        const testImage = new Image();
+
+        let currentSourceIndex = 0;
+
+        function tryNextSource() {
+        if (currentSourceIndex >= iconSources.length) {
+        // 所有源都失败，使用默认图标
+        setDefaultIcon(loadingIcon);
+        return;
+        }
+
+        const source = iconSources[currentSourceIndex];
+        currentSourceIndex++;
+
+        testImage.onload = function() {
+        // 图标加载成功，替换loading图标
+        const img = document.createElement('img');
+        img.className = 'resource-icon';
+        img.src = source;
+        img.alt = '网站图标';
+        img.onerror = function() {
+        // 如果这个图标加载失败，尝试下一个源
+        tryNextSource();
+        };
+
+        loadingIcon.parentNode.replaceChild(img, loadingIcon);
+        };
+
+        testImage.onerror = function() {
+        // 这个源失败，尝试下一个
+        tryNextSource();
+        };
+
+        testImage.src = source;
+        }
+
+        // 开始尝试加载图标
+        tryNextSource();
+        }
+
+        function setDefaultIcon(loadingIcon) {
+        // 创建默认图标（使用网站名称的首字母）
+        const linkElement = loadingIcon.closest('.resource-link');
+        const resourceName = linkElement.querySelector('.resource-name').textContent;
+        const firstLetter = resourceName.charAt(0).toUpperCase();
+
+        const defaultIcon = document.createElement('div');
+        defaultIcon.className = 'resource-icon';
+        defaultIcon.style.display = 'flex';
+        defaultIcon.style.alignItems = 'center';
+        defaultIcon.style.justifyContent = 'center';
+        defaultIcon.style.backgroundColor = 'rgba(255,255,255,0.3)';
+        defaultIcon.style.color = 'white';
+        defaultIcon.style.fontWeight = 'bold';
+        defaultIcon.style.fontSize = '16px';
+        defaultIcon.textContent = firstLetter;
+
+        loadingIcon.parentNode.replaceChild(defaultIcon, loadingIcon);
+        }
+    </script>
 
 </body>
-
 </html>
